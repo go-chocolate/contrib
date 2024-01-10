@@ -5,6 +5,7 @@ go 1.20
 require (
 	github.com/glebarez/sqlite v1.10.0
 	github.com/go-chocolate/configuration/common v0.0.0-20231226080250-a7086d866e72
+	github.com/sirupsen/logrus v1.9.3
 	gorm.io/driver/mysql v1.5.2
 	gorm.io/gorm v1.25.5
 )

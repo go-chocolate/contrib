@@ -39,7 +39,8 @@ func mysqlDriver(c Option) (gorm.Dialector, error) {
 }
 
 func sqliteDriver(c Option) (gorm.Dialector, error) {
-	return sqlite.Open(c.String("Database")), nil
+	dsn := c.String("Database")
+	return sqlite.Open(dsn), nil
 }
 
 func RegisterDriver(name string, driver Driver) {

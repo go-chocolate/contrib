@@ -2,11 +2,8 @@ package gormutil
 
 import (
 	"fmt"
-	"log"
-	"os"
 
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 func Open(c Config, options ...GORMOption) (*gorm.DB, error) {
@@ -21,7 +18,7 @@ func Open(c Config, options ...GORMOption) (*gorm.DB, error) {
 	if err != nil {
 		return nil, fmt.Errorf("database driver on error :%s %v", c.Driver, err)
 	}
-	db, err := gorm.Open(dialer, applyOptions(&gorm.Config{Logger: logger.New(log.New(os.Stdout, "", log.LstdFlags), c.Logger.Build())}, options...))
+	db, err := gorm.Open(dialer, applyOptions(&gorm.Config{Logger: c.Logger.build()}, options...))
 	if err != nil {
 		return nil, err
 	}
@@ -30,10 +27,18 @@ func Open(c Config, options ...GORMOption) (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	innerDB.SetMaxOpenConns(c.MaxOpenConns)
-	innerDB.SetMaxIdleConns(c.MaxIdleConns)
-	innerDB.SetConnMaxIdleTime(c.ConnMaxIdleTime.value())
-	innerDB.SetConnMaxLifetime(c.ConnMaxLifetime.value())
+	if c.MaxOpenConns > 0 {
+		innerDB.SetMaxOpenConns(c.MaxOpenConns)
+	}
+	if c.MaxIdleConns > 0 {
+		innerDB.SetMaxIdleConns(c.MaxIdleConns)
+	}
+	if v := c.ConnMaxIdleTime.value(); v > 0 {
+		innerDB.SetConnMaxIdleTime(v)
+	}
+	if v := c.ConnMaxLifetime.value(); v > 0 {
+		innerDB.SetConnMaxLifetime(v)
+	}
 	return db, nil
 }
 
@@ -43,4 +48,8 @@ func MustOpen(c Config, options ...GORMOption) *gorm.DB {
 		panic(err)
 	}
 	return db
+}
+
+func OpenMemory(options ...GORMOption) (*gorm.DB, error) {
+	return Open(MemoryOption(), options...)
 }

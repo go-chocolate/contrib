@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/go-chocolate/configuration/common"
+	"github.com/sirupsen/logrus"
 	"gorm.io/gorm/logger"
 )
 
@@ -46,7 +47,13 @@ func (l LogLevel) Level() logger.LogLevel {
 	return logger.Info
 }
 
+const (
+	LoggerStd    = "std"
+	LoggerLogrus = "logrus"
+)
+
 type LoggerConfig struct {
+	Logger                    string   // std logrus
 	SlowThreshold             string   //慢查询定义，格式：2s 1s 200ms
 	Colorful                  bool     //
 	IgnoreRecordNotFoundError bool     //忽略 NotFoundError
@@ -54,15 +61,27 @@ type LoggerConfig struct {
 	LogLevel                  LogLevel //日志打印级别 1 Silent, 2 Error, 3 Warn, 4 Info
 }
 
-func (l LoggerConfig) Build() logger.Config {
-	c := logger.Config{
+func (l LoggerConfig) build() logger.Interface {
+	config := logger.Config{
 		Colorful:                  l.Colorful,
 		IgnoreRecordNotFoundError: l.IgnoreRecordNotFoundError,
 		ParameterizedQueries:      l.ParameterizedQueries,
 		LogLevel:                  l.LogLevel.Level(),
 	}
 	if v, err := time.ParseDuration(l.SlowThreshold); err == nil {
-		c.SlowThreshold = v
+		config.SlowThreshold = v
 	}
-	return c
+	switch l.Logger {
+	case LoggerLogrus:
+		return LogrusLogger(config)
+	default:
+		return logger.New(logrus.StandardLogger(), config)
+	}
+}
+
+func MemoryOption() Config {
+	return Config{
+		Driver: SQLITE,
+		Option: Option{"Database": ":memory:"},
+	}
 }

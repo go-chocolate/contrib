@@ -145,3 +145,7 @@ func StdLogger(level ...logger.LogLevel) logger.Interface {
 		LogLevel:                  lev,
 	})
 }
+
+func LogrusLogger(config logger.Config) logger.Interface {
+	return &logrusLogger{Config: config}
+}
