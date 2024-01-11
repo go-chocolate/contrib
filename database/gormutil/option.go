@@ -141,7 +141,7 @@ func StdLogger(level ...logger.LogLevel) logger.Interface {
 		SlowThreshold:             time.Millisecond * 200,
 		Colorful:                  false,
 		IgnoreRecordNotFoundError: true,
-		ParameterizedQueries:      true,
+		ParameterizedQueries:      false,
 		LogLevel:                  lev,
 	})
 }
