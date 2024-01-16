@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+type Context = context.Context
+
 type Setter interface {
 	Set(key, val any)
 }
