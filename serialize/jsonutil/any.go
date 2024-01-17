@@ -2,6 +2,7 @@ package jsonutil
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -38,6 +39,8 @@ func (t Type) String() string {
 	}
 	return ""
 }
+
+var ErrUnknownType = errors.New("unknown field type")
 
 type Any struct {
 	value string
@@ -163,7 +166,7 @@ func (a *Any) Value() (any, error) {
 			return dst, nil
 		}
 	}
-	return nil, nil
+	return nil, ErrUnknownType
 }
 
 func (a *Any) Object() (map[string]*Any, error) {
@@ -221,4 +224,52 @@ func (a *Any) String() string {
 
 func (a *Any) IsNull() bool {
 	return a.Type == Null
+}
+
+func (a *Any) MustValue() any {
+	val, err := a.Value()
+	if err != nil {
+		panic(err)
+	}
+	return val
+}
+
+func (a *Any) MustObject() map[string]*Any {
+	val, err := a.Object()
+	if err != nil {
+		panic(err)
+	}
+	return val
+}
+
+func (a *Any) MustArray() []*Any {
+	val, err := a.Array()
+	if err != nil {
+		panic(err)
+	}
+	return val
+}
+
+func (a *Any) MustInt64() int64 {
+	val, err := a.Int64()
+	if err != nil {
+		panic(err)
+	}
+	return val
+}
+
+func (a *Any) MustFloat64() float64 {
+	val, err := a.Float64()
+	if err != nil {
+		panic(err)
+	}
+	return val
+}
+
+func (a *Any) MustBoolean() bool {
+	val, err := a.Boolean()
+	if err != nil {
+		panic(err)
+	}
+	return val
 }
