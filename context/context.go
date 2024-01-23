@@ -6,7 +6,11 @@ import (
 	"time"
 )
 
-type Context = context.Context
+type (
+	Context         = context.Context
+	CancelFunc      = context.CancelFunc
+	CancelCauseFunc = context.CancelCauseFunc
+)
 
 type Setter interface {
 	Set(key, val any)
@@ -29,12 +33,16 @@ func (c *valueContext) Set(key, val any) {
 }
 
 var (
-	Background      = context.Background
-	WithCancel      = context.WithCancel
-	TODO            = context.TODO
-	WithCancelCause = context.WithCancelCause
-	WithDeadline    = context.WithDeadline
-	WithTimeout     = context.WithTimeout
+	Background       = context.Background
+	WithCancel       = context.WithCancel
+	TODO             = context.TODO
+	WithCancelCause  = context.WithCancelCause
+	WithDeadline     = context.WithDeadline
+	WithTimeout      = context.WithTimeout
+	WithValue        = context.WithValue
+	Cause            = context.Cause
+	Canceled         = context.Canceled
+	DeadlineExceeded = context.DeadlineExceeded
 )
 
 // WithoutCancel returns a copy of parent that is not canceled when parent is canceled.
