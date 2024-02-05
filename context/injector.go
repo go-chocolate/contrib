@@ -12,3 +12,9 @@ func WithContext(ctx context.Context, injector ...Injector) context.Context {
 	}
 	return ctx
 }
+
+type InjectFunc func(ctx context.Context) context.Context
+
+func (f InjectFunc) WithContext(ctx context.Context) context.Context {
+	return f(ctx)
+}
