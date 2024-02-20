@@ -18,6 +18,12 @@ func WithDisallowUnknownFields() DecodeOption {
 	}
 }
 
+func WithUseNumber() DecodeOption {
+	return func(d *decoder) {
+		d.d.UseNumber()
+	}
+}
+
 func applyDecodeOptions(d *json.Decoder, options ...DecodeOption) {
 	de := &decoder{d: d}
 	for _, option := range options {
@@ -27,7 +33,6 @@ func applyDecodeOptions(d *json.Decoder, options ...DecodeOption) {
 
 func NewDecoder(reader io.Reader, options ...DecodeOption) *json.Decoder {
 	d := json.NewDecoder(reader)
-	d.UseNumber()
 	applyDecodeOptions(d, options...)
 	return d
 }
