@@ -140,7 +140,7 @@ func (a *Authorization) HTTPHandler() http.HandlerFunc {
 			default:
 				message = "system error"
 			}
-			http.Error(writer, message, http.StatusUnauthorized)
+			http.Error(writer, message, http.StatusBadRequest)
 		} else {
 			json.NewEncoder(writer).Encode(map[string]interface{}{"token": token})
 		}
