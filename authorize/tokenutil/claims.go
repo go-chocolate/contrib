@@ -1,6 +1,7 @@
 package tokenutil
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"sort"
@@ -57,43 +58,22 @@ func (c Claims) String() string {
 	return base64.StdEncoding.WithPadding(base64.NoPadding).EncodeToString(b)
 }
 
-type Token struct {
-	ClientId  string `json:"clientId"`
-	Secret    string `json:"secret"`
-	Timestamp int64  `json:"timestamp"`
+type claimsContextKey struct{}
+
+var _claimsContextKey = &claimsContextKey{}
+
+func (c Claims) WithContext(ctx context.Context) context.Context {
+	return context.WithValue(ctx, _claimsContextKey, c)
 }
 
-type Tokens map[string]*Token
-
-func (t Tokens) JSON() []byte {
-	b, _ := json.Marshal(t)
-	return b
-}
-
-func (t Tokens) Remove(clientId string) {
-	delete(t, clientId)
-}
-
-func (t Tokens) Get(clientId string) *Token {
-	return t[clientId]
-}
-
-func (t Tokens) Set(token *Token, max int) {
-	t[token.ClientId] = token
-	if max > 0 && len(t) > max {
-		t.removeOldest()
+func FromContext(ctx context.Context) Claims {
+	v := ctx.Value(_claimsContextKey)
+	if v == nil {
+		return make(Claims)
 	}
-}
-
-func (t Tokens) removeOldest() {
-	if len(t) == 0 {
-		return
+	c, ok := v.(Claims)
+	if !ok {
+		return Claims{}
 	}
-	var oldest *Token
-	for _, v := range t {
-		if oldest == nil || v.Timestamp < oldest.Timestamp {
-			oldest = v
-		}
-	}
-	delete(t, oldest.ClientId)
+	return c
 }

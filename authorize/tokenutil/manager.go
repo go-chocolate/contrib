@@ -32,13 +32,20 @@ func WithMaxTokenPerUser(max int) Option {
 	}
 }
 
+func WithMaxAge(max time.Duration) Option {
+	return func(m *Manager) {
+		m.maxAge = max
+	}
+}
+
 type Manager struct {
 	storage         Storage
 	maxTokenPerUser int
+	maxAge          time.Duration
 }
 
 func NewManager(options ...Option) *Manager {
-	m := &Manager{maxTokenPerUser: 10}
+	m := &Manager{maxTokenPerUser: 10, maxAge: time.Hour * 24 * 7}
 	applyOptions(m, options)
 	if m.storage == nil {
 		m.storage = NewMemoryStorage()
@@ -99,7 +106,7 @@ func (m *Manager) ValidateToken(ctx context.Context, tokenString string) (Claims
 	if token == nil {
 		return nil, ErrTokenInvalid
 	}
-	if time.Now().UnixMilli() > token.Timestamp+7*24*86400*1000 {
+	if time.Now().UnixMilli() > token.Timestamp+int64(m.maxAge/time.Millisecond) {
 		return nil, ErrTokenExpired
 	}
 	var signature = toMd5([]byte(head.Encode() + claims.Encode() + token.Secret))
