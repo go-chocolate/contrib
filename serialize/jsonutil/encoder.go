@@ -54,6 +54,31 @@ func String(v any, options ...EncodeOption) (string, error) {
 }
 
 func MaybeString(v any, options ...EncodeOption) string {
-	s, _ := String(v)
+	s, _ := String(v, options...)
 	return s
+}
+
+func MaybeBytes(v any, options ...EncodeOption) []byte {
+	b, _ := Marshal(v, options...)
+	return b
+}
+
+type errorReader struct {
+	err error
+	re  io.Reader
+}
+
+func (r *errorReader) Read(b []byte) (int, error) {
+	if r.err != nil {
+		return 0, r.err
+	}
+	return r.re.Read(b)
+}
+
+func Reader(v any, options ...EncodeOption) io.Reader {
+	b, err := Marshal(v, options...)
+	return &errorReader{
+		err: err,
+		re:  bytes.NewReader(b),
+	}
 }
