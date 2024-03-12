@@ -69,5 +69,5 @@ func (m *ModelOperator[T]) Delete(ctx context.Context) (rowsAffected int64, err 
 }
 
 func (m *ModelOperator[T]) List(ctx context.Context, limit, offset int, order ...any) ([]*T, int64, error) {
-	return m.Rep.FindList(ctx, m.Value, limit, offset, order...)
+	return m.Rep.List(ctx, m.Value, limit, offset, order...)
 }
