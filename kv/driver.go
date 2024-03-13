@@ -1,11 +1,13 @@
 package kv
 
 const (
-	REDIS = "redis"
+	REDIS  = "redis"
+	MEMORY = "memory"
 )
 
 type Driver func(c Option) (Storage, error)
 
 var drivers = map[string]Driver{
-	REDIS: redisDriver,
+	REDIS:  redisDriver,
+	MEMORY: memoryDriver,
 }
